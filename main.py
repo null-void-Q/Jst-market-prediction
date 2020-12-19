@@ -20,7 +20,7 @@ def main():
 
     validationSet = JaneStreetDataset(csv_file=validation_file,transform=None)
 
-    validationLoader = torch.utils.data.DataLoader(validationSet, batch_size=4096, num_workers=6)
+    validationLoader = torch.utils.data.DataLoader(validationSet, batch_size=2048, num_workers=6)
 
 
     classes = ('profitable', 'non-profitable')
