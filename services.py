@@ -2,7 +2,7 @@ import torch
 
 def train (net,trainloader,epochs,criterion,optimizer,validationLoader=None,device=None) :
 
-    for epoch in range(epochs):  
+    for epoch in range(epochs):
         epoch_loss = 0.0
         epoch_acc = 0
         for i, data in enumerate(trainloader, 0):
@@ -12,7 +12,7 @@ def train (net,trainloader,epochs,criterion,optimizer,validationLoader=None,devi
 
             # zero the parameter gradients
             optimizer.zero_grad()
-            
+
             # forward + backward + optimize
             outputs = net(inputs)
 
@@ -25,16 +25,17 @@ def train (net,trainloader,epochs,criterion,optimizer,validationLoader=None,devi
             # print statistics (add more)
             epoch_loss += loss.item()
             epoch_acc += acc.item()
-            print('Training.... | Epoch: ',(epoch+1),'| Batch: ',(i+1),'/',len(trainloader))
-        
+            print('Training.... | Epoch: ',(epoch+1),'| Batch: ',(i+1),'/',len(trainloader), end='\r')
+        print()
+
         if(validationLoader):
             v_loss,v_acc = validate(net,validationLoader,criterion,device)
-        
+
         print('-'*20)
         print(f'Epoch {epoch+1:03}: | Loss: {epoch_loss/len(trainloader):.5f} | Acc: {epoch_acc/len(trainloader):.3f}')
-        print(f'Validation Loss: {v_loss:.5f} | Acc: {v_acc:.3f}')
-        print('-'*20)
-        
+        print(f'Validation Loss: {v_loss:.5f} | Acc: {v_acc:.3f}', end='\r')
+        print('\n-'*20)
+
     return net
 
 
