@@ -32,7 +32,7 @@ def main():
     lossFn = nn.BCELoss()
     optimizer = optim.Adam(net.parameters(),lr=0.01)
 
-    train(net,trainloader,3,lossFn,optimizer,validationLoader=validationLoader,device = device)
+    train(net,trainloader,25,lossFn,optimizer,validationLoader=validationLoader,device = device)
     torch.save(net.state_dict(),model_path )
 
 

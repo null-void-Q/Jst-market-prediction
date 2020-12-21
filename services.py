@@ -28,12 +28,14 @@ def train (model,trainloader,epochs,criterion,optimizer,validationLoader=None,de
             print('Training.... | Epoch: ',(epoch+1),'| Batch: ',(i+1),'/',len(trainloader), end='\r')
         print()
 
+        v_loss,v_acc = [0,0]
         if(validationLoader):
             v_loss,v_acc = validate(model,validationLoader,criterion,device)
 
         print('-'*20)
         print(f'Epoch {epoch+1:03}: | Loss: {epoch_loss/len(trainloader):.5f} | Acc: {epoch_acc/len(trainloader):.3f}')
-        print(f'Validation Loss: {v_loss:.5f} | Acc: {v_acc:.3f}')
+        if(validationLoader):
+            print(f'Validation Loss: {v_loss:.5f} | Acc: {v_acc:.3f}')
         print('-'*20)
 
     return model
