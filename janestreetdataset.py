@@ -14,20 +14,19 @@ class JaneStreetDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        self.market_data = JaneStreetDataset.loadAndPreprocess(csv_file)
+        self.labels,self.features = JaneStreetDataset.loadAndPreprocess(csv_file)
         self.transform = transform
 
     def __len__(self):
-        return len(self.market_data)
+        return len(self.labels)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        label = torch.tensor(self.market_data.iloc[idx][7] > 0,dtype=torch.float32)
-        features = self.market_data.iloc[idx][8:]
-        features = torch.tensor(features,dtype=torch.float32)
-        
+        label = torch.tensor(self.labels.iloc[idx] > 0,dtype=torch.float32)
+        features = torch.tensor(self.features.iloc[idx],dtype=torch.float32)    
+
         sample = features,label
         
         if self.transform:
@@ -38,9 +37,11 @@ class JaneStreetDataset(Dataset):
     def loadAndPreprocess(file_path):
         print('Loading Data...')
         data = pd.read_csv(file_path,dtype='float32')
-        means = data.iloc[:,8:].mean()
-        data.iloc[:,8:] = data.iloc[:,8:].fillna(means)
-        return data
+        labels = data['resp']
+        features = data.iloc[:,data.columns.str.contains('feature')]
+        means = features.mean()
+        features = features.fillna(means)
+        return labels,features
 
     @staticmethod    
     def split_dataset(file_path,outDir,split_pcnt):

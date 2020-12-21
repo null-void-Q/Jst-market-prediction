@@ -13,6 +13,7 @@ class NullNet (nn.Module):
         self.batchnorm = nn.BatchNorm1d(256)
         self.drop = nn.Dropout(p=0.25) # may cause probs on testing set (not used rn)
         self.fc3 = nn.Linear(256, 1)
+        self.sig = nn.Sigmoid()
 
     def forward(self, x):
         x = self.normalize(x)
@@ -21,4 +22,5 @@ class NullNet (nn.Module):
         x = self.batchnorm(x)
         x = self.drop(x)
         x = self.fc3(x)
+        x = self.sig(x)
         return x

@@ -8,22 +8,20 @@ from services import train
 
 train_file = '../data/x_train.csv'
 validation_file = '../data/x_validation.csv'
-
+model_path = 'x_model.pth'
 
 def main():
 
     trainset = JaneStreetDataset(csv_file=train_file,transform=None)
 
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=2048,
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=4096,
                                             shuffle=True, num_workers=6)
 
 
     validationSet = JaneStreetDataset(csv_file=validation_file,transform=None)
 
-    validationLoader = torch.utils.data.DataLoader(validationSet, batch_size=2048, num_workers=6)
+    validationLoader = torch.utils.data.DataLoader(validationSet, batch_size=4096, num_workers=6)
 
-
-    classes = ('profitable', 'non-profitable')
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -31,11 +29,11 @@ def main():
     net = NullNet()
     net.to(device)
 
-    lossFn = nn.BCEWithLogitsLoss()
+    lossFn = nn.BCELoss()
     optimizer = optim.Adam(net.parameters(),lr=0.01)
 
-    train(net,trainloader,1,lossFn,optimizer,validationLoader=validationLoader,device = device)
-
+    train(net,trainloader,3,lossFn,optimizer,validationLoader=validationLoader,device = device)
+    torch.save(net.state_dict(),model_path )
 
 
 
