@@ -41,6 +41,7 @@ class JaneStreetDataset(Dataset):
         features = data.iloc[:,data.columns.str.contains('feature')]
         means = features.mean()
         features = features.fillna(means)
+        #features=(features-features.min())/(features.max()-features.min())
         return labels,features
 
     @staticmethod    

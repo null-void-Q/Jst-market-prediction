@@ -1,9 +1,10 @@
 #import janestreet
+import pandas as pd
 import torch
 from nullnet import NullNet
 from services import predict
 
-MODEL_PATH = './x_model.pth'
+MODEL_PATH = './x0_model_e30.pth'
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -17,8 +18,8 @@ data = pd.read_csv('../data/example_test.csv',dtype='float32')
 features = data.iloc[:,data.columns.str.contains('feature')]
 means = features.mean()
 features = features.fillna(means)
-features = features.iloc[:10]
-print(predict(model,features,device))
+inputs = torch.tensor(features.values,dtype=torch.float32)
+print(predict(model,inputs,device))
 
 #env = janestreet.make_env() # initialize the environment
 #iter_test = env.iter_test() # an iterator which loops over the test set
