@@ -18,7 +18,7 @@ class JaneStreetDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.features)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
@@ -47,9 +47,9 @@ class JaneStreetDataset(Dataset):
     @staticmethod    
     def split_dataset(file_path,outDir,split_pcnt):
         
-        data = JaneStreetDataset.loadAndPreprocess(file_path)
+        data = pd.read_csv(file_path,dtype='float32')
       
-        dates = pd.unique(data['date'])
+        dates = data['date'].unique()
 
         validation_set = pd.DataFrame(data=None,columns=data.columns)
 
@@ -57,8 +57,8 @@ class JaneStreetDataset(Dataset):
 
             d = data[data['date'] == date]
 
-            positive_resp = d[d['resp'] > 0]
-            negative_resp = d[d['resp'] < 0]
+            positive_resp = d[d['resp'] > 0.]
+            negative_resp = d[d['resp'] < 0.]
 
             #num_of_pos = math.ceil(len(positive_resp)*(split_pcnt/2))
             #num_of_neg = math.ceil(len(negative_resp)*(split_pcnt/2))

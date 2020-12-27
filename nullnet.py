@@ -6,9 +6,9 @@ class NullNet (nn.Module):
     def __init__(self):
         super(NullNet,self).__init__()
         
-        self.fc1 = nn.Linear(130, 256)
-        self.fc2 = nn.Linear(256, 1024)
-        self.fc3 = nn.Linear(1024, 1024)
+        self.fc1 = nn.Linear(130, 1024)
+        self.fc2 = nn.Linear(1024, 256)
+        self.fc3 = nn.Linear(256, 1024)
         self.fc4 = nn.Linear(1024, 256)
         self.fc5 = nn.Linear(256, 1)
         self.sig = nn.Sigmoid()
@@ -22,9 +22,9 @@ class NullNet (nn.Module):
     def forward(self, x):
         x = self.normalize(x)
         x = self.relu(self.fc1(x))
-        x = self.batchnorm256(x)
-        x = self.relu(self.fc2(x))
         x = self.batchnorm1024(x)
+        x = self.relu(self.fc2(x))
+        x = self.batchnorm256(x)
         x = self.drop(x)
         x = self.relu(self.fc3(x))
         x = self.batchnorm1024(x)

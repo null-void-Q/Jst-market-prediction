@@ -6,7 +6,7 @@ from nullnet import NullNet
 from services import train
 
 
-train_file = '../data/x_train.csv'
+train_file = '../data/train.csv'
 validation_file = '../data/x_validation.csv'
 model_path = 'x_model.pth'
 
@@ -27,12 +27,13 @@ def main():
 
 
     net = NullNet()
+    #net.load_state_dict(torch.load('./x0_model_ex40.pth'))
     net.to(device)
 
     lossFn = nn.BCELoss()
     optimizer = optim.Adam(net.parameters(),lr=0.01)
 
-    train(net,trainloader,30,lossFn,optimizer,validationLoader=validationLoader,device = device)
+    train(net,trainloader,40,lossFn,optimizer,validationLoader=validationLoader,device = device)
     torch.save(net.state_dict(),model_path )
 
 
