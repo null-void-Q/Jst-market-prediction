@@ -3,6 +3,7 @@ from torchvision import transforms
 from torch.utils.data import Dataset
 import pandas as pd
 import math
+import numpy as np
 
 class JaneStreetDataset(Dataset):
     """Jane Street dataset."""
@@ -24,7 +25,7 @@ class JaneStreetDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        label = torch.tensor(self.labels.iloc[idx] > 0,dtype=torch.float32)
+        label = torch.tensor(self.labels.iloc[idx],dtype=torch.float32)
         features = torch.tensor(self.features.iloc[idx],dtype=torch.float32)    
 
         sample = features,label
@@ -34,15 +35,24 @@ class JaneStreetDataset(Dataset):
 
         return sample
     @staticmethod    
-    def loadAndPreprocess(file_path):
+    def loadAndPreprocess(file_path, means_path='./f_mean.npy'):
         print('Loading Data...')
         data = pd.read_csv(file_path,dtype='float32')
-        labels = data['resp']
+        data = data.query('weight > 0').reset_index(drop=True)
+        labels = (data['resp'] > 0).astype('int')
         features = data.iloc[:,data.columns.str.contains('feature')]
-        means = features.mean()
+        means = pd.Series(np.load(means_path),index=features.columns[1:],dtype='float32')
         features = features.fillna(means)
         #features=(features-features.min())/(features.max()-features.min())
         return labels,features
+
+    @staticmethod
+    def calculate_mean(file_path):
+        data = pd.read_csv(file_path,dtype='float32')
+        features = data.iloc[:,data.columns.str.contains('feature')]
+        f_mean = features.iloc[:,1:].mean()
+        f_mean = f_mean.values
+        np.save('f_mean.npy', f_mean)
 
     @staticmethod    
     def split_dataset(file_path,outDir,split_pcnt):
@@ -73,3 +83,6 @@ class JaneStreetDataset(Dataset):
 
         validation_set.to_csv(outDir+'/x_validation.csv',index=False)
         train_set.to_csv(outDir+'/x_train.csv',index=False)
+
+if __name__ == "__main__":
+    JaneStreetDataset.calculate_mean('../data/train.csv')

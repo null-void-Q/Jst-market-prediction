@@ -20,7 +20,7 @@ means = features.mean()
 features = features.fillna(means)
 inputs = torch.tensor(features.values,dtype=torch.float32)
 predictions = predict(model,inputs,device)
-print(predictions.cpu().data.numpy())
+print(torch.tensor(predictions)
 
 #env = janestreet.make_env() # initialize the environment
 #iter_test = env.iter_test() # an iterator which loops over the test set

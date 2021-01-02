@@ -1,16 +1,22 @@
 import pandas as pd
+from sklearn.model_selection import GroupKFold
+
 pd.set_option("max_columns", None)
 pd.set_option("max_rows", None)
 
 
-csv_file = '../data/example_test.csv'
+csv_file = '../data/train.csv'
 
 
 
 def main():
     data = pd.read_csv(csv_file,dtype='float32')
+
     dates = data['date']
-    features = data.iloc[:,data.columns.str.contains('feature')]
+    #features = data.iloc[:,data.columns.str.contains('feature')]
+
+    dates = dates.unique()
+    print(dates, len(dates))
     #print(features.describe())
     #print(features['feature_7'])
     #means = features.mean()
