@@ -1,11 +1,11 @@
-#import janestreet
 import pandas as pd
+import numpy as np
 import torch
 from nullnet import NullNet
 from services import predict
 
-MODEL_PATH = './x0_model_ex52.pth'
-
+MODEL_PATH = './x0_model.pth'
+MEANS_PATH='./f_mean.npy'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 model = NullNet()
@@ -16,17 +16,9 @@ model.to(device)
 
 data = pd.read_csv('../data/example_test.csv',dtype='float32')
 features = data.iloc[:,data.columns.str.contains('feature')]
-means = features.mean()
+means = pd.Series(np.load(MEANS_PATH),index=features.columns[1:],dtype='float32')
 features = features.fillna(means)
 inputs = torch.tensor(features.values,dtype=torch.float32)
 predictions = predict(model,inputs,device)
-print(torch.tensor(predictions)
-
-#env = janestreet.make_env() # initialize the environment
-#iter_test = env.iter_test() # an iterator which loops over the test set
-
-# for (test_df, prediction_df) in iter_test:
-#     X_test = test_df.loc[:, test_df.columns.str.contains('feature')]
-#     preds = model(X_test)
-#     prediction_df.action = 0 #make your 0/1 prediction here
-#     env.predict(prediction_df)
+print(torch.tensor(predictions))
+print(features.columns[1:])

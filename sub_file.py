@@ -2,7 +2,7 @@ import janestreet
 import torch
 import torch.nn as nn
 
-MODEL_PATH = '/kaggle/input/submition-model/x0_model_ex52.pth'
+MODEL_PATH = '/kaggle/input/submition-model/x0_model.pth'
 
 ########################################################
 class NullNet (nn.Module):

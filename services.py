@@ -1,8 +1,9 @@
 import torch
 
 def train (model,trainloader,epochs,criterion,optimizer,validationLoader=None,device=None) :
-
+    
     for epoch in range(epochs):
+        model.train()
         epoch_loss = 0.0
         epoch_acc = 0
         for i, data in enumerate(trainloader, 0):
@@ -42,6 +43,7 @@ def train (model,trainloader,epochs,criterion,optimizer,validationLoader=None,de
 
 
 def validate(model,validloader,lossFn,device=None):
+    model.eval()
     v_loss = 0.0
     v_acc = 0
     for  i,data in enumerate(validloader):

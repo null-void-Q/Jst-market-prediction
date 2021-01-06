@@ -6,12 +6,13 @@ from nullnet import NullNet
 from services import train
 
 
-train_file = '../data/train.csv'
+train_file = '../data/x_train.csv'
 validation_file = '../data/x_validation.csv'
 model_path = 'x_model.pth'
 
-BATCH_SIZE = 4096
+BATCH_SIZE =  4096
 EPOCHS = 10
+LR = 0.01
 
 def main():
 
@@ -29,16 +30,27 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
+
     net = NullNet()
-    #net.load_state_dict(torch.load('./x0_model_ex40.pth'))
     net.to(device)
-
     lossFn = nn.BCELoss()
-    optimizer = optim.Adam(net.parameters(),lr=0.001)
+    optimizer = optim.Adam(net.parameters(),lr=LR)
 
-    train(net,trainloader,EPOCHS,lossFn,optimizer,validationLoader=validationLoader,device = device)
+    # checkpoint = torch.load('x_model_checkpoint.pth')
+    # net.load_state_dict(checkpoint['model_state_dict'])
+    # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    # net.to(device)
+
+
+    net = train(net,trainloader,EPOCHS,lossFn,optimizer,validationLoader=validationLoader,device = device)
+
     torch.save(net.state_dict(),model_path )
-
+    torch.save({
+            'epoch': EPOCHS,
+            'model_state_dict': net.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': -1,
+            },'x_model_checkpoint.pth')
 
 
 

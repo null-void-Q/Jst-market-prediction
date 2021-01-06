@@ -83,6 +83,3 @@ class JaneStreetDataset(Dataset):
 
         validation_set.to_csv(outDir+'/x_validation.csv',index=False)
         train_set.to_csv(outDir+'/x_train.csv',index=False)
-
-if __name__ == "__main__":
-    JaneStreetDataset.calculate_mean('../data/train.csv')
