@@ -11,7 +11,7 @@ validation_file = '../data/x_validation.csv'
 model_path = 'x_model.pth'
 
 BATCH_SIZE =  4096
-EPOCHS = 50
+EPOCHS = 150
 LR = 0.001
 
 def main():
