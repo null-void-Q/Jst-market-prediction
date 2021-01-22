@@ -39,6 +39,18 @@ def train (model,trainloader,epochs,criterion,optimizer,validationLoader=None,de
             print(f'Validation Loss: {v_loss:.5f} | Acc: {v_acc:.3f}')
         print('-'*20)
 
+        #save checkpoint
+
+        torch.save({
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': epoch_loss,
+        'acc':epoch_acc,
+        'vloss':v_loss,
+        'vacc':v_acc,
+        },'x_model_checkpoint.pth')
+
     return model
 
 

@@ -1,6 +1,5 @@
 #mine
 *.pth
-*.npy
 *.csv
 tmp.py
 # Byte-compiled / optimized / DLL files
