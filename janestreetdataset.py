@@ -25,7 +25,7 @@ class JaneStreetDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        label = torch.tensor(self.labels.iloc[idx],dtype=torch.float32)
+        label = torch.tensor(self.labels[idx],dtype=torch.float32)
         features = torch.tensor(self.features.iloc[idx],dtype=torch.float32)    
 
         sample = features,label
@@ -39,7 +39,10 @@ class JaneStreetDataset(Dataset):
         print('Loading Data...')
         data = pd.read_csv(file_path,dtype='float32')
         data = data.query('weight > 0').reset_index(drop=True)
-        labels = (data['resp'] > 0).astype('int')
+        data = data.query('date > 85').reset_index(drop = True) 
+        resp_cols = ['resp','resp_1', 'resp_2', 'resp_3', 'resp_4']
+        labels = np.median(np.stack([(data[c] > 0).astype('int') for c in resp_cols]).T,axis=1).astype(np.int16)
+        #labels = (data['resp'] > 0).astype('int')
         features = data.iloc[:,data.columns.str.contains('feature')]
         means = pd.Series(np.load(means_path),index=features.columns[1:],dtype='float32')
         features = features.fillna(means)

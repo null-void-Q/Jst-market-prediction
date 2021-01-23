@@ -11,7 +11,7 @@ validation_file = '../data/x_validation.csv'
 model_path = 'x_model.pth'
 
 BATCH_SIZE =  6114
-EPOCHS = 50
+EPOCHS = 30
 LR = 0.001
 
 def main():
@@ -36,9 +36,10 @@ def main():
     lossFn = nn.BCELoss()
     optimizer = optim.Adam(net.parameters(),lr=LR)
 
-    # checkpoint = torch.load('x0_model_checkpoint.pth',map_location=device)
+    # checkpoint = torch.load('x1s_model_checkpoint.pth',map_location=device)
     # net.load_state_dict(checkpoint['model_state_dict'])
     # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
     net.to(device)
 
 
