@@ -24,7 +24,10 @@ def main():
 
     og_data = data.copy()
 
-    data['action'] = (data['resp'] > 0).astype('int')
+    data = data.query('weight > 0').reset_index(drop=True)
+    data = data.query('date > 85').reset_index(drop = True)
+    resp_cols = ['resp','resp_1', 'resp_2', 'resp_3', 'resp_4']
+    data['action']  = np.median(np.stack([(data[c] > 0).astype('int') for c in resp_cols]).T,axis=1).astype(np.int16)
 
     fclms = data.iloc[:,data.columns.str.contains('feature')].columns
     means = pd.Series(np.load('./f_mean.npy'),index=fclms[1:],dtype='float32')
@@ -37,7 +40,7 @@ def main():
     best_split = [[],[]]
 
     for fold, (tr, te) in enumerate(dataSplits):
-
+        
         trainset = JaneStreetDataset(labels=data.loc[tr,'action'],features=data.loc[tr,fclms])
 
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
@@ -61,6 +64,8 @@ def main():
         if(checkpoint['vacc'] > best_acc):
             best_acc = checkpoint['vacc']
             best_split = tr,te
+
+            
     trainsplit = og_data.loc[best_split[0]]
     validationsplit = og_data.loc[best_split[1]]
 
@@ -68,6 +73,7 @@ def main():
     validationsplit.to_csv('../data'+'/b_validation.csv',index=False)
 
     print('best split had an accuracy of: ',best_acc)
+
 
 class JaneStreetDataset(Dataset):
     """Jane Street dataset."""
