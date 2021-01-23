@@ -43,7 +43,7 @@ def main():
     net.to(device)
 
 
-    net = train(net,trainloader,EPOCHS,lossFn,optimizer,validationLoader=validationLoader,device = device)
+    net = train(net,trainloader,EPOCHS,lossFn,optimizer,utility_params=validationSet.utilityParams,validationLoader=validationLoader,device = device)
 
     torch.save(net.state_dict(),model_path )
 

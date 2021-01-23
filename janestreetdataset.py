@@ -15,7 +15,7 @@ class JaneStreetDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        self.labels,self.features = JaneStreetDataset.loadAndPreprocess(csv_file)
+        self.labels,self.features,self.utilityParams = JaneStreetDataset.loadAndPreprocess(csv_file)
         self.transform = transform
 
     def __len__(self):
@@ -27,8 +27,9 @@ class JaneStreetDataset(Dataset):
 
         label = torch.tensor(self.labels[idx],dtype=torch.float32)
         features = torch.tensor(self.features.iloc[idx],dtype=torch.float32)    
+        
 
-        sample = features,label
+        sample = features,label,idx
         
         if self.transform:
             sample = self.transform(sample)  
@@ -38,6 +39,7 @@ class JaneStreetDataset(Dataset):
     def loadAndPreprocess(file_path, means_path='./f_mean.npy'):
         print('Loading Data...')
         data = pd.read_csv(file_path,dtype='float32')
+        data['date'] = data['date'].astype(int)
         data = data.query('weight > 0').reset_index(drop=True)
         data = data.query('date > 85').reset_index(drop = True) 
         resp_cols = ['resp','resp_1', 'resp_2', 'resp_3', 'resp_4']
@@ -47,7 +49,12 @@ class JaneStreetDataset(Dataset):
         means = pd.Series(np.load(means_path),index=features.columns[1:],dtype='float32')
         features = features.fillna(means)
         #features=(features-features.min())/(features.max()-features.min())
-        return labels,features
+
+        utilityc = ['date','weight','resp']
+        utilityParams = data.loc[:,utilityc]
+        utilityParams['action'] = 0
+        
+        return labels, features,  utilityParams
 
     @staticmethod
     def calculate_mean(file_path):

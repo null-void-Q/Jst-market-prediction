@@ -56,11 +56,14 @@ def main():
         lossFn = nn.BCELoss()
         optimizer = optim.Adam(net.parameters(),lr=LR)
 
+        save_pth =  f'x_f{fold}_model.pth'
 
-
-        net = train(net,trainloader,EPOCHS,lossFn,optimizer,validationLoader=validationLoader,device = device)
+        net = train(net,trainloader,EPOCHS,lossFn,optimizer,
+                                    utility_params=validationSet.utilityParams,
+                                    validationLoader=validationLoader,
+                                    checkpoint_pth=save_pth,device = device)
    
-        checkpoint = torch.load('x_model_checkpoint.pth')
+        checkpoint = torch.load(save_pth)
         if(checkpoint['vacc'] > best_acc):
             best_acc = checkpoint['vacc']
             best_split = tr,te
