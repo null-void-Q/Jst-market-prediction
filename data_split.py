@@ -21,11 +21,13 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
   
     data = pd.read_csv(data_path,dtype='float32') 
+    data['date'] = data['date'].astype(int)
 
     og_data = data.copy()
 
     data = data.query('weight > 0').reset_index(drop=True)
     data = data.query('date > 85').reset_index(drop = True)
+    utilityc = ['date','weight','resp']
     resp_cols = ['resp','resp_1', 'resp_2', 'resp_3', 'resp_4']
     data['action']  = np.median(np.stack([(data[c] > 0).astype('int') for c in resp_cols]).T,axis=1).astype(np.int16)
 
@@ -41,13 +43,13 @@ def main():
 
     for fold, (tr, te) in enumerate(dataSplits):
         
-        trainset = JaneStreetDataset(labels=data.loc[tr,'action'],features=data.loc[tr,fclms])
+        trainset = JaneStreetDataset(labels=data.loc[tr,'action'],features=data.loc[tr,fclms],utilityParams=data.loc[tr,utilityc])
 
         trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE,
                                             shuffle=True, num_workers=6)
 
 
-        validationSet = JaneStreetDataset(labels=data.loc[te,'action'],features=data.loc[te,fclms])
+        validationSet = JaneStreetDataset(labels=data.loc[te,'action'],features=data.loc[te,fclms],utilityParams=data.loc[te,utilityc])
 
         validationLoader = torch.utils.data.DataLoader(validationSet, batch_size=BATCH_SIZE, num_workers=6)
 
@@ -81,7 +83,7 @@ def main():
 class JaneStreetDataset(Dataset):
     """Jane Street dataset."""
 
-    def __init__(self, labels,features):
+    def __init__(self, labels,features,utilityParams=None):
         """
         Args:
             csv_file (string): Path to the csv file with data.
@@ -90,6 +92,8 @@ class JaneStreetDataset(Dataset):
         """
         self.labels = labels
         self.features =features
+        self.utilityParams = utilityParams
+        self.utilityParams['action'] = 0
 
     def __len__(self):
         return len(self.features)
@@ -101,7 +105,7 @@ class JaneStreetDataset(Dataset):
         label = torch.tensor(self.labels.iloc[idx],dtype=torch.float32)
         features = torch.tensor(self.features.iloc[idx],dtype=torch.float32)    
 
-        sample = features,label
+        sample = features,label,idx
 
         return sample
 if __name__ == "__main__":
