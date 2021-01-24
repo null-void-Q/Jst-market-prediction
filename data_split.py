@@ -12,9 +12,9 @@ from services import train
 data_path = '../data/train.csv'
 
 BATCH_SIZE =  6114
-EPOCHS = 10
+EPOCHS = 5
 LR = 0.001
-N_SPLITS = 5
+N_SPLITS = 10
 
 def main():
 
@@ -25,8 +25,8 @@ def main():
 
     og_data = data.copy()
 
-    data = data.query('weight > 0').reset_index(drop=True)
-    data = data.query('date > 85').reset_index(drop = True)
+    #data = data.query('weight > 0').reset_index(drop=True)
+    #data = data.query('date > 85').reset_index(drop = True)
     utilityc = ['date','weight','resp']
     resp_cols = ['resp','resp_1', 'resp_2', 'resp_3', 'resp_4']
     data['action']  = np.median(np.stack([(data[c] > 0).astype('int') for c in resp_cols]).T,axis=1).astype(np.int16)
@@ -38,7 +38,7 @@ def main():
     gkf = GroupKFold(n_splits = N_SPLITS)
     dataSplits = gkf.split(data['action'].values, data['action'].values, data['date'].values)
 
-    best_loss,best_acc = [1,0]
+    best_score = 0
     best_split = [[],[]]
 
     for fold, (tr, te) in enumerate(dataSplits):
@@ -58,7 +58,7 @@ def main():
         lossFn = nn.BCELoss()
         optimizer = optim.Adam(net.parameters(),lr=LR)
 
-        save_pth =  f'x_f{fold}_model.pth'
+        save_pth =  f'xa_f{fold}_model.pth'
 
         net = train(net,trainloader,EPOCHS,lossFn,optimizer,
                                     utility_params=validationSet.utilityParams,
@@ -66,18 +66,18 @@ def main():
                                     checkpoint_pth=save_pth,device = device)
    
         checkpoint = torch.load(save_pth)
-        if(checkpoint['vacc'] > best_acc):
-            best_acc = checkpoint['vacc']
+        if(checkpoint['score'] > best_score):
+            best_score = checkpoint['score']
             best_split = tr,te
 
             
     trainsplit = og_data.loc[best_split[0]]
     validationsplit = og_data.loc[best_split[1]]
 
-    trainsplit.to_csv('../data'+'/b_train.csv',index=False)
-    validationsplit.to_csv('../data'+'/b_validation.csv',index=False)
+    trainsplit.to_csv('../data'+'/a_train.csv',index=False)
+    validationsplit.to_csv('../data'+'/a_validation.csv',index=False)
 
-    print('best split had an accuracy of: ',best_acc)
+    print('best split had an score of: ',best_score)
 
 
 class JaneStreetDataset(Dataset):
